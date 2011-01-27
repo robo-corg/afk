@@ -1,0 +1,32 @@
+#!/opt/local/bin/python
+
+import os
+import subprocess
+from appscript import *
+import argparse
+from time import sleep
+
+parser = argparse.ArgumentParser(description='Go afk quickly.')
+
+parser.add_argument('-b', '--back', action='store_true')
+parser.add_argument('--no-lock', action='store_true')
+
+
+args = parser.parse_args()
+
+if args.back:
+    print "Returning"
+    app('iChat').status.set(k.available)
+
+    # status seems to stay as 'away' unless we update it
+    # also seems to need a sleep
+    sleep(1)
+    app('iChat').status_message.set('')
+
+    app('adium').go_available(None)
+else:
+    app('iChat').status.set(k.away)    
+    app('adium').go_away(None)
+
+    if not args.no_lock:
+        subprocess.call(['/System/Library/CoreServices/Menu Extras/user.menu/Contents/Resources/CGSession', '-suspend'])
